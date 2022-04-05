@@ -1,0 +1,14 @@
+const db_config = require('./config/db.config');
+const knex = require('knex');
+
+const db = knex({
+    client: 'pg',
+    connection: {
+        host: db_config.Url,
+        user: db_config.User,
+        password: db_config.Pass,
+        database: db_config.Name
+    }
+});
+
+module.exports = db;
