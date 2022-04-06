@@ -16,7 +16,7 @@ class EmpolyesController {
     async getEmployeById(req, res, next){
         try{
             const id = req.params.id
-            const dbRes = await db.select('*').from('EMPLOYES').where('id',id);
+            const dbRes = await db('EMPLOYES').where('ID',id);
             res.json(dbRes);
         }
         catch (error){
@@ -25,13 +25,10 @@ class EmpolyesController {
         }
     }
 
-    //Проверить
-    //API POST new contacts
     async postEmploye(req, res, next){
         try{
-            const {website, phoneNumber, VK, inst} = req.body
-            const result = await db.query(`INSERT INTO contacts (website, phoneNumber, VK, inst) values($1, $2, $3, $4) RETURNING *`, [website, phoneNumber, VK, inst])
-            res.json(result.rows[0])
+            const result = await db('EMPLOYES').insert(req.body);
+            res.json(result)
         }
         catch (error){
             console.error(error)
@@ -39,11 +36,12 @@ class EmpolyesController {
         }
     }
 
-    //Проверить
-    //API PUT contacts
     async putEmploye(req, res, next){
         try{
-
+            const {ID, ...rest} = req.body;
+            const result = await db('EMPLOYES').update(rest).where("ID", ID)
+            console.log(result)
+            res.json(result);
         }
         catch (error){
             console.error(error)
@@ -51,11 +49,11 @@ class EmpolyesController {
         }
     }
 
-    //Проверить
-    //API DELETE contacts
     async deleteEmploye(req, res, next){
         try{
-
+            const result = await db('EMPLOYES').where("ID", req.params.id).del();
+            console.log(result);
+            res.json(result);
         }
         catch (error){
             console.error(error)
