@@ -8,7 +8,10 @@ const db = knex({
         user: db_config.User,
         port: db_config.Port,
         password: db_config.Pass,
-        database: db_config.Name
+        database: db_config.Name,
+        ssl: {
+            rejectUnauthorized: false,
+        }
     }
 });
 
