@@ -17,5 +17,5 @@ app.use('/api',employesRouter );
 app.use('/api',departamentRouter);
 app.use('/api',postsRouter);
 
-const port = appConfig.Port || 8080;
+const port = appConfig.Port || 8000;
 app.listen(port, () => console.log(`Сервер работает на порту ${port}, http://localhost:${port}`));
