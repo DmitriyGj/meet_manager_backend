@@ -4,7 +4,7 @@ const knex = require('knex');
 const params = db_config.Url.split(':')
 const db = knex({
     client: 'pg',
-    connection:`${db_config.Url}useSSL=false`
+    connection:`${db_config.Url}&useSSL=false`
     // {
     //     host: db_config.Url,
     //     user: db_config.User,
