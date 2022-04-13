@@ -1,4 +1,4 @@
-const db = require('../DBConnection')
+const db = require('../DBconnection')
 
 //API
 class PostsController {
