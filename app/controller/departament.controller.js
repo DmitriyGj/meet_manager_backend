@@ -1,4 +1,4 @@
-const db = require('../DBconnection')
+const db = require('../DBConnection')
 
 //API
 class DepartamentController {
