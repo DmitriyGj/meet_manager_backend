@@ -2,13 +2,11 @@ const db_config = require('./config/db.config');
 const knex = require('knex');
 
 const params = db_config.Url.split(':')
-console.log(params)
 const connection = {}
-Object.keys(params).forEach(item =>connection[key] = params[key] )
-connection[ssl] = false
+params.forEach(item)
 const db = knex({
     client: 'pg',
-    connection
+    connection:`${db_config.Url}useSSL=false`
     // {
     //     host: db_config.Url,
     //     user: db_config.User,
