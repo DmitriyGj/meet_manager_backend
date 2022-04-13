@@ -40,7 +40,6 @@ class EmpolyesController {
         try{
             const {ID, ...rest} = req.body;
             const result = await db('EMPLOYES').update(rest).where("ID", ID)
-            console.log(result)
             res.json(result);
         }
         catch (error){
@@ -52,7 +51,6 @@ class EmpolyesController {
     async deleteEmploye(req, res, next){
         try{
             const result = await db('EMPLOYES').where("ID", req.params.id).del();
-            console.log(result);
             res.json(result);
         }
         catch (error){

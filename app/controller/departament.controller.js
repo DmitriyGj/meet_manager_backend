@@ -6,7 +6,6 @@ class DepartamentController {
     async getDepartaments(req, res, next ) {
         try{
             const dbRes = await db.select('*').from('DEPARTAMENT');
-            console.log(dbRes);
             res.json(dbRes);
         }
         catch(err) {
@@ -30,11 +29,8 @@ class DepartamentController {
     //API POST new contacts
     async postDepartament(req, res, next){
         try{
-            console.log(req.body)
             const {NAME} = req.body
-            console.log(NAME)
             const result = await db('DEPARTAMENT').insert({NAME})
-            console.log(result);
             res.json(result.rows[0])
         }
         catch (error){
@@ -49,7 +45,6 @@ class DepartamentController {
         try{
             const {name} = req.body
             const result = await db('DEPARTAMENT').insert({NAME:name})
-            console.log(result);
             res.json(result.rows[0])
         }
         catch (error){

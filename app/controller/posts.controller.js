@@ -6,7 +6,6 @@ class PostsController {
     async getPosts(req, res, next ) {
         try{
             const dbRes = await db.select('*').from('POSTS');
-            console.log(dbRes);
             res.json(dbRes);
         }
         catch(err) {
