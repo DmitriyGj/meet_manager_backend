@@ -5,7 +5,19 @@ class EmpolyesController {
     //API GET all contacts
     async getEmployes(req, res, next ) {
         try{
-            const dbRes = await db.select('*').from('EMPLOYES');
+            const dbRes = await db.select('EMPLOYES.ID as ID',
+                                'EMPLOYES.NAME as NAME',
+                                'EMPLOYES.LAST_NAME as LAST_NAME',
+                                'EMPLOYES.PATRONYMIC as PATRONYMIC',
+                                'EMPLOYES.PHONE as PHONE',
+                                'POSTS.POST_NAME as POST_NAME',
+                                'EMPLOYES.POST_ID as POST_ID',
+                                'POSTS.DEPART_ID as DEPART_ID',
+                                'DEPARTAMENT.NAME as DEPART_NAME',
+                                'EMPLOYES.ADDRESS as ADDRESS',
+                                'EMPLOYES.EMAIL as EMAIL',
+                                ).from('EMPLOYES').leftJoin('POSTS',"POST_ID","POSTS.ID" ).leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
+            console.log(dbRes);
             res.json(dbRes);
         }
         catch(err) {
@@ -17,7 +29,7 @@ class EmpolyesController {
         try{
             const id = req.params.id
             const dbRes = await db('EMPLOYES').where('ID',id);
-            res.json(dbRes);
+            res.json(dbRes[0]);
         }
         catch (error){
             console.error(error)
