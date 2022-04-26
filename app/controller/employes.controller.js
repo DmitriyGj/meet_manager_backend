@@ -17,7 +17,6 @@ class EmpolyesController {
                                 'EMPLOYES.ADDRESS as ADDRESS',
                                 'EMPLOYES.EMAIL as EMAIL',
                                 ).from('EMPLOYES').leftJoin('POSTS',"POST_ID","POSTS.ID" ).leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
-            console.log(dbRes);
             res.json(dbRes);
         }
         catch(err) {

@@ -12,10 +12,12 @@ app.use(cors());
 const employesRouter = require('./app/route/employes.routes');
 const departamentRouter = require('./app/route/departament.routes');
 const postsRouter = require('./app/route/post.routes');
+const authRouter = require('./app/route/auth.routes')
 
 app.use('/api',employesRouter );
 app.use('/api',departamentRouter);
 app.use('/api',postsRouter);
+app.use('/api', authRouter );
 
 const port = appConfig.Port || 8000;
 app.listen(port, () => console.log(`Сервер работает на порту ${port}, http://localhost:${port}`));
