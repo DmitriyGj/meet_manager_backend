@@ -1,8 +1,6 @@
 const db = require('../DBConnection')
 
-//API
 class EmpolyesController {
-    //API GET all contacts
     async getEmployes(req, res, next ) {
         try{
             const dbRes = await db.select('EMPLOYES.ID as ID',
@@ -16,17 +14,20 @@ class EmpolyesController {
                                 'DEPARTAMENT.NAME as DEPART_NAME',
                                 'EMPLOYES.ADDRESS as ADDRESS',
                                 'EMPLOYES.EMAIL as EMAIL',
-                                ).from('EMPLOYES').leftJoin('POSTS',"POST_ID","POSTS.ID" ).leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
+                                ).from('EMPLOYES')
+                                .leftJoin('POSTS',"POST_ID","POSTS.ID" )
+                                .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
+            dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
             res.json(dbRes);
         }
         catch(err) {
             next(err);
         };
     }
-    //API GET contact by id
+
     async getEmployeById(req, res, next){
         try{
-            const id = req.params.id
+            const id = req.params.id;
             const dbRes = await db('EMPLOYES').where('ID',id);
             res.json(dbRes[0]);
         }
@@ -59,6 +60,17 @@ class EmpolyesController {
         }
     }
 
+    async getMemberCards(req,res,next){
+        try{
+            const result = await db('MEMBER_CARDS').where("MEMBER_ID", req.params.id);
+            res.json(result);
+        }
+        catch (error){
+            console.error(error)
+            next(error)
+        }
+    }
+
     async deleteEmploye(req, res, next){
         try{
             const result = await db('EMPLOYES').where("ID", req.params.id).del();
@@ -69,6 +81,23 @@ class EmpolyesController {
             next(error)
         }
     }
+
+    async getChartInfo(req,res,next) {
+        try {
+            const result = await db.count('MEMBER_ID').from('MEMBER_CARDS')
+                                            .groupBy("MEMBER_ID", "NAME", "LAST_NAME")
+                                            .leftJoin('EMPLOYES', 'MEMBER_ID', "EMPLOYES.ID")
+                                            .select('NAME', "LAST_NAME")
+;
+            console.log(result);
+            res.json(result);
+        }
+        catch(error){
+            console.log(error);
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new EmpolyesController()

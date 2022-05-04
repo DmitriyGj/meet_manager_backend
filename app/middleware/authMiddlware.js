@@ -17,6 +17,6 @@ module.exports = function (req, res, next) {
     }
     catch(e){
         console.log(e);
-        return res.status(403).json({message:'Пользователь не авторизован'});
+        return res.status(403).json({status:403,message:'Токен протух'});
     }
 };
