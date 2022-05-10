@@ -1,4 +1,3 @@
-const { json } = require('express');
 const db = require('../DBConnection')
 
 //API
@@ -25,15 +24,12 @@ class MeetingsController {
             const meetingInfoDbRes = await db('MEETINGS')
                                             .where('ID',id);
             console.log(meetingInfoDbRes)
-            const membersInfo = await db.select('MEMBER_CARDS.ID as CARD_ID',
-                                            'EMPLOYES.ID as EMPLOYE_ID',
-                                            'EMPLOYES.NAME as EMPLOYE_NAME',
-                                            'EMPLOYES.LAST_NAME as EMPLOYE_LASTNAME')
+            const membersInfo = await db.select('EMPLOYES.ID')
                                             .from('MEMBER_CARDS')
                                             .leftJoin('EMPLOYES', 'MEMBER_ID', 'EMPLOYES.ID')
                                             .where("MEETING_ID", id);
 
-            const info = {meeting: meetingInfoDbRes[0], members: membersInfo};
+            const info = {...meetingInfoDbRes[0], members: membersInfo.map(item=>item.ID)};
 
             res.json(info);
         }
@@ -45,14 +41,16 @@ class MeetingsController {
 
     async postMeeting(req, res, next){
         try{
-            const {meeting, members} = req.body;
-            const result = await db('MEETINGS').insert(meeting).returning('ID');
+            const {START_DATE, END_DATE, members} = req.body;
+            const result = await db('MEETINGS').insert({START_DATE, END_DATE}).returning('ID');
+            console.log(result[0].ID, members);
             const membersCards = []
             for(let member of members){
+                console.log(member);
                 const res = await db('MEMBER_CARDS').insert({MEMBER_ID:member.ID, MEETING_ID: result[0].ID}).returning('ID')
                 membersCards.push( res[0].ID);
             }
-            console.log(membersCards)
+            console.log(result)
             res.json({meeting:result[0].ID , membersCards})
         }
         catch (error){

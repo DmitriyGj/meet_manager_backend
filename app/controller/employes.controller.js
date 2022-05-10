@@ -13,8 +13,7 @@ class EmpolyesController {
                                 'POSTS.DEPART_ID as DEPART_ID',
                                 'DEPARTAMENT.NAME as DEPART_NAME',
                                 'EMPLOYES.ADDRESS as ADDRESS',
-                                'EMPLOYES.EMAIL as EMAIL',
-                                ).from('EMPLOYES')
+                                'EMPLOYES.EMAIL as EMAIL',).from('EMPLOYES')
                                 .leftJoin('POSTS',"POST_ID","POSTS.ID" )
                                 .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
@@ -39,6 +38,7 @@ class EmpolyesController {
 
     async postEmploye(req, res, next){
         try{
+            console.log(req.body)
             const result = await db('EMPLOYES').insert(req.body);
             res.json(result)
         }
