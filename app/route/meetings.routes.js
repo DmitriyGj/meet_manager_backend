@@ -8,5 +8,6 @@ router.get('/meetings',authMiddleware, MeetingsCotroller.getMeetings);
 router.get('/meetings/:id',authMiddleware, MeetingsCotroller.getMeetingById);
 router.post('/meetings',authMiddleware ,MeetingsCotroller.postMeeting);
 router.delete('/meetings/:id', authMiddleware, MeetingsCotroller.deleteMeeting);
+router.put('/meetings/:id', authMiddleware, MeetingsCotroller.putMeeting);
 
 module.exports = router;

@@ -13,7 +13,8 @@ class EmpolyesController {
                                 'POSTS.DEPART_ID as DEPART_ID',
                                 'DEPARTAMENT.NAME as DEPART_NAME',
                                 'EMPLOYES.ADDRESS as ADDRESS',
-                                'EMPLOYES.EMAIL as EMAIL',).from('EMPLOYES')
+                                'EMPLOYES.EMAIL as EMAIL',
+                                ).from('EMPLOYES')
                                 .leftJoin('POSTS',"POST_ID","POSTS.ID" )
                                 .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
@@ -38,7 +39,6 @@ class EmpolyesController {
 
     async postEmploye(req, res, next){
         try{
-            console.log(req.body)
             const result = await db('EMPLOYES').insert(req.body);
             res.json(result)
         }
@@ -84,12 +84,15 @@ class EmpolyesController {
 
     async getChartInfo(req,res,next) {
         try {
-            const result = await db.count('MEMBER_ID').from('MEMBER_CARDS')
-                                            .groupBy("MEMBER_ID", "NAME", "LAST_NAME")
-                                            .leftJoin('EMPLOYES', 'MEMBER_ID', "EMPLOYES.ID")
-                                            .select('NAME', "LAST_NAME")
-;
-            console.log(result);
+            const emps = await db.select('ID',"NAME","LAST_NAME").from('EMPLOYES');
+            const meetings = await db.select('*').from('MEETINGS');
+            console.log(meetings)
+            const result = []
+            for(let employe of emps){
+                const {ID} = employe;
+                const meetingsOfEmploye = meetings.filter(item =>item.MEMBERS.includes(ID));
+                result.push({...employe, count: meetingsOfEmploye.length})
+            }
             res.json(result);
         }
         catch(error){

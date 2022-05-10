@@ -23,15 +23,8 @@ class MeetingsController {
             const id = req.params.id
             const meetingInfoDbRes = await db('MEETINGS')
                                             .where('ID',id);
-            console.log(meetingInfoDbRes)
-            const membersInfo = await db.select('EMPLOYES.ID')
-                                            .from('MEMBER_CARDS')
-                                            .leftJoin('EMPLOYES', 'MEMBER_ID', 'EMPLOYES.ID')
-                                            .where("MEETING_ID", id);
 
-            const info = {...meetingInfoDbRes[0], members: membersInfo.map(item=>item.ID)};
-
-            res.json(info);
+            res.json(meetingInfoDbRes[0]);
         }
         catch (error){
             console.error(error)
@@ -41,17 +34,9 @@ class MeetingsController {
 
     async postMeeting(req, res, next){
         try{
-            const {START_DATE, END_DATE, members} = req.body;
-            const result = await db('MEETINGS').insert({START_DATE, END_DATE}).returning('ID');
-            console.log(result[0].ID, members);
-            const membersCards = []
-            for(let member of members){
-                console.log(member);
-                const res = await db('MEMBER_CARDS').insert({MEMBER_ID:member.ID, MEETING_ID: result[0].ID}).returning('ID')
-                membersCards.push( res[0].ID);
-            }
-            console.log(result)
-            res.json({meeting:result[0].ID , membersCards})
+            const {START_DATE, END_DATE, MEMBERS} = req.body;
+            const result = await db('MEETINGS').insert({START_DATE, END_DATE, MEMBERS}).returning('ID');
+            res.json({meeting:result[0].ID})
         }
         catch (error){
             console.error(error)
@@ -61,15 +46,11 @@ class MeetingsController {
 
     async putMeeting(req, res, next){
         try{
-            const {ID, ...rest} = req.body;
-            const {meeting, members} = rest;
-            const result = await db('MEETINGS').update(meeting).where("ID", ID).returning("*");
-            const membersCards = [];
-            for(let member in members){
-                const res = await db('MEMBER_CARDS').update(member).WHERE("ID", member.CARD_ID).returning("*")
-                res.push(res[0])
-            }
-            res.json({meeting: result[0], members: membersCards});
+            const {ID,  MEMBERS,...rest} = req.body;
+            const parsedMembers = MEMBERS.map(id => +id);
+            console.log(req.body);
+            const result = await db('MEETINGS').update({...rest, MEMBERS:parsedMembers}).where("ID", ID).returning("*");
+            res.json({meeting: result[0]});
         }
         catch (error){
             console.error(error)
