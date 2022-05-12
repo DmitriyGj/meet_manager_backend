@@ -8,6 +8,6 @@ router.post('/auth', [
     check('LOGIN', 'Имя пользователя не может быть пустым').notEmpty(),
     check('PASSWORD', 'Пароль не может быть меньше 4-ех символов').isLength({min:4, max: Number.MAX_VALUE})
 ] , AuthController.GetToken);
-router.get('/auth', AuthController.GetToken);
+router.post('/registrate', AuthController.addUser);
 
 module.exports = router;

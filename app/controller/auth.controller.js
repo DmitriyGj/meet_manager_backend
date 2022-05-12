@@ -4,12 +4,12 @@ const {validationResult} = require('express-validator');
 const jwt = require('jsonwebtoken');
 const {secret} = require('../config/app.config')
 
-const generateAccessToken = (id, role) => {
+const generateAccessToken = (user) => {
     const payload = {
-        id, 
-        role
+        user:user
     };
-    return jwt.sign(payload, secret, {expiresIn: "24h"});
+    const token = jwt.sign(payload, secret, {expiresIn: "24h"});
+    return token;
 }
 
 class AuthController {
@@ -19,13 +19,13 @@ class AuthController {
             if(!errors.isEmpty()){
                 return res.status(400).json({message:'Reg Error', errors})
             }
-            const {LOGIN, PASSWORD, ROLE_ID }  = req.body;
+            const {LOGIN, PASSWORD, EMAIL, ROLE_ID }  = req.body;
             const check = await db.select('*').from('USERS').where('LOGIN', LOGIN)[0];
             if(!!check){
                 return res.status(400).json({message:'Login is using'})
             }
             const hashesPassword = bcrypt.hashSync(PASSWORD);
-            const result = await db('USERS').insert({LOGIN, PASSWORD: hashesPassword, ROLE_ID});
+            const result = await db('USERS').insert({LOGIN, PASSWORD: hashesPassword,EMAIL, ROLE_ID});
             res.json(result);
         }
         catch(e){
@@ -37,17 +37,17 @@ class AuthController {
     async GetToken(req, res, next) {
         try{
             const {LOGIN, PASSWORD} = req.body;
-            const user = await db.select('*').from('USERS').where('LOGIN', LOGIN).first();
+            const user = await db.select('*').from('USERS').where('LOGIN', LOGIN).leftJoin('ROLES', 'USERS.ROLE_ID', 'ROLES.ROLE_ID').first();
             if(!user){
-                return res.status(400).json({message:'Пользователь не найден'});
+                return res.status(404).json({message:'Пользователь не найден'});
             }
             const validPassword = bcrypt.compareSync(PASSWORD, user.PASSWORD.trim());
             if(!validPassword){
                 return res.status(400).json({message:'Неверный пароль'});
             }
-
-            const token = generateAccessToken(user.ID, user.ROLE_ID);
-            console.log(token)
+            console.log(user)
+            const {USER_ID, ROLE_NAME, EMAIL, LOGIN:USER_LOGIN} = user;
+            const token = generateAccessToken({USER_ID,ROLE_NAME, EMAIL, USER_LOGIN});
             return res.json({token});
         }
         catch(e){

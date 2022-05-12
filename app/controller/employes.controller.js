@@ -13,10 +13,11 @@ class EmpolyesController {
                                 'POSTS.DEPART_ID as DEPART_ID',
                                 'DEPARTAMENT.NAME as DEPART_NAME',
                                 'EMPLOYES.ADDRESS as ADDRESS',
-                                'EMPLOYES.EMAIL as EMAIL',
+                                'USERS.EMAIL as EMAIL',
                                 ).from('EMPLOYES')
                                 .leftJoin('POSTS',"POST_ID","POSTS.ID" )
-                                .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID');
+                                .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID')
+                                .leftJoin('USERS', "EMPLOYES.USER_ID", "USERS.USER_ID");
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
             res.json(dbRes);
         }
@@ -28,8 +29,9 @@ class EmpolyesController {
     async getEmployeById(req, res, next){
         try{
             const id = req.params.id;
-            const dbRes = await db('EMPLOYES').where('ID',id);
-            res.json(dbRes[0]);
+            const dbRes = await db('USERS').where('ID',id)
+                .leftJoin("EMPLOYES", "EMPLOYES.USER_ID", "USERS.USER_ID").first();
+            res.json(dbRes);
         }
         catch (error){
             console.error(error)
@@ -39,8 +41,15 @@ class EmpolyesController {
 
     async postEmploye(req, res, next){
         try{
-            const result = await db('EMPLOYES').insert(req.body);
-            res.json(result)
+            const {LOGIN, EMAIL, PASSWORD, ROLE_ID,...rest} = req.body;
+            const userRes = await db('USERS')
+                        .insert({LOGIN, EMAIL, PASSWORD, ROLE_ID})
+                        .returning('USER_ID');
+            const employeRes = await db('EMPLOYES')
+                                .insert({...rest, USER_ID: userRes[0].USER_ID})
+                                .returning('*');
+            console.log(employeRes);
+            res.json(employeRes)
         }
         catch (error){
             console.error(error)
@@ -86,7 +95,6 @@ class EmpolyesController {
         try {
             const emps = await db.select('ID',"NAME","LAST_NAME").from('EMPLOYES');
             const meetings = await db.select('*').from('MEETINGS');
-            console.log(meetings)
             const result = []
             for(let employe of emps){
                 const {ID} = employe;

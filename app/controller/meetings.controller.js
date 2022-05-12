@@ -10,7 +10,6 @@ class MeetingsController {
                                 'MEETINGS.END_DATE as END_DATE',
                                 ).from('MEETINGS')
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
-            console.log(dbRes);
             res.json(dbRes);
         }
         catch(err) {
@@ -48,7 +47,6 @@ class MeetingsController {
         try{
             const {ID,  MEMBERS,...rest} = req.body;
             const parsedMembers = MEMBERS.map(id => +id);
-            console.log(req.body);
             const result = await db('MEETINGS').update({...rest, MEMBERS:parsedMembers}).where("ID", ID).returning("*");
             res.json({meeting: result[0]});
         }
