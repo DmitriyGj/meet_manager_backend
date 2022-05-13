@@ -41,7 +41,7 @@ class AuthController {
             if(!user){
                 return res.status(404).json({message:'Пользователь не найден'});
             }
-            const validPassword = bcrypt.compareSync(PASSWORD, user.PASSWORD.trim());
+            const validPassword = bcrypt.compareSync(PASSWORD, user.PASSWORDy);
             if(!validPassword){
                 return res.status(400).json({message:'Неверный пароль'});
             }
