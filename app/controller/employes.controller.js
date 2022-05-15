@@ -16,7 +16,7 @@ class EmpolyesController {
                                 'EMPLOYES.ADDRESS as ADDRESS',
                                 'USERS.EMAIL as EMAIL',
                                 ).from('EMPLOYES')
-                                .leftJoin('POSTS',"POST_ID","POSTS.ID" )
+                                .leftJoin('POSTS',"EMPLOYES.POST_ID","POSTS.POST_ID" )
                                 .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.DEPART_ID')
                                 .leftJoin('USERS', "EMPLOYES.USER_ID", "USERS.USER_ID");
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value?.toString().trim()));
