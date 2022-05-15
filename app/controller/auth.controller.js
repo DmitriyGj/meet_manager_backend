@@ -41,13 +41,14 @@ class AuthController {
             if(!user){
                 return res.status(404).json({message:'Пользователь не найден'});
             }
-            const validPassword = bcrypt.compareSync(PASSWORD, user.PASSWORDy);
+            const validPassword = bcrypt.compareSync(PASSWORD, user.PASSWORD);
             if(!validPassword){
                 return res.status(400).json({message:'Неверный пароль'});
             }
-            console.log(user)
             const {USER_ID, ROLE_NAME, EMAIL, LOGIN:USER_LOGIN} = user;
-            const token = generateAccessToken({USER_ID,ROLE_NAME, EMAIL, USER_LOGIN});
+            const employeProfile = await db.select('EMPLOYES.ID as ID').from('EMPLOYES').where('USER_ID', USER_ID).first();
+            console.log(employeProfile)
+            const token = generateAccessToken({...employeProfile, ...user, PASSWORD });
             return res.json({token});
         }
         catch(e){

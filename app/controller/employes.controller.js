@@ -1,4 +1,5 @@
 const db = require('../DBConnection')
+const bcrypt = require('bcryptjs');
 
 class EmpolyesController {
     async getEmployes(req, res, next ) {
@@ -11,14 +12,14 @@ class EmpolyesController {
                                 'POSTS.POST_NAME as POST_NAME',
                                 'EMPLOYES.POST_ID as POST_ID',
                                 'POSTS.DEPART_ID as DEPART_ID',
-                                'DEPARTAMENT.NAME as DEPART_NAME',
+                                'DEPARTAMENT.DEPART_NAME as DEPART_NAME',
                                 'EMPLOYES.ADDRESS as ADDRESS',
                                 'USERS.EMAIL as EMAIL',
                                 ).from('EMPLOYES')
                                 .leftJoin('POSTS',"POST_ID","POSTS.ID" )
-                                .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.ID')
+                                .leftJoin('DEPARTAMENT','POSTS.DEPART_ID','DEPARTAMENT.DEPART_ID')
                                 .leftJoin('USERS', "EMPLOYES.USER_ID", "USERS.USER_ID");
-            dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
+            dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value?.toString().trim()));
             res.json(dbRes);
         }
         catch(err) {
@@ -29,8 +30,12 @@ class EmpolyesController {
     async getEmployeById(req, res, next){
         try{
             const id = req.params.id;
-            const dbRes = await db('USERS').where('ID',id)
-                .leftJoin("EMPLOYES", "EMPLOYES.USER_ID", "USERS.USER_ID").first();
+            const dbRes = await db('EMPLOYES').where('ID',id)
+                .leftJoin("USERS", "EMPLOYES.USER_ID", "USERS.USER_ID")
+                .leftJoin('POSTS', 'EMPLOYES.POST_ID', 'POSTS.POST_ID' )
+                .leftJoin('ROLES', 'USERS.ROLE_ID', 'ROLES.ROLE_ID' )
+                .leftJoin('DEPARTAMENT', 'POSTS.DEPART_ID', 'DEPARTAMENT.DEPART_ID').first();
+            console.log(dbRes)
             res.json(dbRes);
         }
         catch (error){
@@ -43,7 +48,7 @@ class EmpolyesController {
         try{
             const {LOGIN, EMAIL, PASSWORD, ROLE_ID,...rest} = req.body;
             const userRes = await db('USERS')
-                        .insert({LOGIN, EMAIL, PASSWORD, ROLE_ID})
+                        .insert({LOGIN, EMAIL, PASSWORD:bcrypt.hashSync(PASSWORD), ROLE_ID})
                         .returning('USER_ID');
             const employeRes = await db('EMPLOYES')
                                 .insert({...rest, USER_ID: userRes[0].USER_ID})
@@ -57,7 +62,7 @@ class EmpolyesController {
         }
     }
 
-    async putEmploye(req, res, next){
+    async getEmpoyeMeetings(req,res,next) {
         try{
             const {ID, ...rest} = req.body;
             const result = await db('EMPLOYES').update(rest).where("ID", ID)
@@ -69,10 +74,13 @@ class EmpolyesController {
         }
     }
 
-    async getMemberCards(req,res,next){
+    async putEmploye(req, res, next){
         try{
-            const result = await db('MEMBER_CARDS').where("MEMBER_ID", req.params.id);
-            res.json(result);
+            const {ID, LOGIN, PASSWORD, EMAIL, ROLE_ID, ...rest} = req.body;
+            const result = await db('EMPLOYES').update(rest).where("ID", ID).returning('*');
+            const {USER_ID} = result[0];
+            const userResult = await db('USERS').update({LOGIN, PASSWORD:bcrypt.hashSync(PASSWORD), EMAIL, ROLE_ID}).where("USER_ID", USER_ID).returning('*');
+            res.json({...result,...userResult});
         }
         catch (error){
             console.error(error)
@@ -82,8 +90,10 @@ class EmpolyesController {
 
     async deleteEmploye(req, res, next){
         try{
-            const result = await db('EMPLOYES').where("ID", req.params.id).del();
-            res.json(result);
+            const result = await db('EMPLOYES').where("ID", req.params.id).del().returning('*');
+            const {USER_ID} = result[0];
+            const userResult = await db('USERS').where("USER_ID", USER_ID).del().returning('*');
+            res.json({...result[0], ...userResult[0]});
         }
         catch (error){
             console.error(error)
@@ -101,6 +111,21 @@ class EmpolyesController {
                 const meetingsOfEmploye = meetings.filter(item =>item.MEMBERS.includes(ID));
                 result.push({...employe, count: meetingsOfEmploye.length})
             }
+            res.json(result);
+        }
+        catch(error){
+            console.log(error);
+            next(error);
+        }
+    }
+
+    async getEmployeMeetings(req,res,next){
+        try {
+            const {id} = req.params;
+            const meetings = await db.select('*').from('MEETINGS');
+            console.log(meetings)
+            const result = meetings.filter(item =>{return item.MEMBERS.includes(+id)})
+            console.log(id, result)
             res.json(result);
         }
         catch(error){

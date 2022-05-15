@@ -44,7 +44,8 @@ class DepartamentController {
     async putDepartament(req, res, next){
         try{
             const {name} = req.body
-            const result = await db('DEPARTAMENT').insert({NAME:name})
+            const {id} = req.params;
+            const result = await db('DEPARTAMENT').update({NAME:name}).where('DEPART_ID', id)
             res.json(result.rows[0])
         }
         catch (error){
