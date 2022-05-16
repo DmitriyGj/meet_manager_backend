@@ -7,7 +7,8 @@ class MeetingsController {
         try{
             const dbRes = await db.select('MEETINGS.ID as ID',
                                 'MEETINGS.START_DATE as START_DATE',
-                                'MEETINGS.END_DATE as END_DATE',)
+                                'MEETINGS.END_DATE as END_DATE',
+                                'EMPLOYES.ID as INICIATOR_ID')
                                 .leftJoin("EMPLOYES", "EMPLOYES.ID" , "MEETINGS.INICIATOR_ID")
                                 .from('MEETINGS')
             dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
@@ -35,7 +36,7 @@ class MeetingsController {
     async postMeeting(req, res, next){
         try{
             const {START_DATE, END_DATE, MEMBERS, INICIATOR_ID} = req.body;
-            const result = await db('MEETINGS').insert({START_DATE, END_DATE, MEMBERS: [...MEMBERS, INICIATOR_ID.toString()], INICIATOR_ID}).returning('*');
+            const result = await db('MEETINGS').insert({START_DATE, END_DATE, MEMBERS, INICIATOR_ID}).returning('*');
             console.log(result)
             res.json({meeting:result[0]})
         }

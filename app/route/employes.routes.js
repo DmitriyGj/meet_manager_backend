@@ -10,6 +10,6 @@ router.get('/employes/:id/meetings', EmployesCotroller.getEmployeMeetings);
 router.post('/employes', authMiddleware , EmployesCotroller.postEmploye);
 router.put('/employes/:id',authMiddleware, EmployesCotroller.putEmploye);
 router.delete('/employes/:id', authMiddleware, EmployesCotroller.deleteEmploye);
-router.get('/employes_chart', authMiddleware, EmployesCotroller.getChartInfo);
+router.get('/employes_chart',  EmployesCotroller.getChartInfo);
 
 module.exports = router;
