@@ -35,8 +35,6 @@ class EmpolyesController {
                 .leftJoin('POSTS', 'EMPLOYES.POST_ID', 'POSTS.POST_ID' )
                 .leftJoin('ROLES', 'USERS.ROLE_ID', 'ROLES.ROLE_ID' )
                 .leftJoin('DEPARTAMENT', 'POSTS.DEPART_ID', 'DEPARTAMENT.DEPART_ID').first();
-            bcrypt.
-            console.log(dbRes)
             res.json(dbRes);
         }
         catch (error){

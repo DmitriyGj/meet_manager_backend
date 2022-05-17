@@ -9,7 +9,7 @@ class GuestsController {
                                 'GUESTS.LAST_NAME as LAST_NAME',
                                 'GUESTS.PATRONYMIC as PATRONYMIC',
                                 'GUESTS.PHONE as PHONE',
-                                'GUESTS.EMAIL as EMAIL',
+                                'USERS.EMAIL as EMAIL',
                                 'ROLES.ROLE_NAME as ROLE_NAME'
                                 ).from('GUESTS')
                                 .leftJoin('USERS',"USERS.USER_ID","GUESTS.USER_ID" )

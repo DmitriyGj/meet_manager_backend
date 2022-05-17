@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddlware');
 const GuestsCotroller = require('../controller/guests.controller');
 
 router.get('/guests',authMiddleware, GuestsCotroller.getGuests);
-router.get('/geusts/:id',authMiddleware, GuestsCotroller.getGuestById);
+router.get('/guests/:id',authMiddleware, GuestsCotroller.getGuestById);
 router.get('/guests/:id/meetings', GuestsCotroller.getGuestMeetings);
 router.post('/guests', authMiddleware , GuestsCotroller.postGuest);
 router.put('/guests/:id',authMiddleware, GuestsCotroller.putGuest);
