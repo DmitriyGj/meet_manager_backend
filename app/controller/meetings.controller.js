@@ -1,8 +1,6 @@
 const db = require('../DBConnection')
 
-//API
 class MeetingsController {
-    //API GET all contacts
     async getMeetings(req, res, next ) {
         try{
             const dbRes = await db.select('MEETINGS.ID as ID',
@@ -35,8 +33,8 @@ class MeetingsController {
 
     async postMeeting(req, res, next){
         try{
-            const {START_DATE, END_DATE, MEMBERS, INICIATOR_ID} = req.body;
-            const result = await db('MEETINGS').insert({START_DATE, END_DATE, MEMBERS, INICIATOR_ID}).returning('*');
+            const {START_DATE, END_DATE, MEMBERS, INICIATOR_ID, GUESTS} = req.body;
+            const result = await db('MEETINGS').insert({START_DATE, END_DATE, GUESTS, MEMBERS, INICIATOR_ID}).returning('*');
             console.log(result)
             res.json({meeting:result[0]})
         }
@@ -48,9 +46,10 @@ class MeetingsController {
 
     async putMeeting(req, res, next){
         try{
-            const {ID,  MEMBERS,...rest} = req.body;
+            const {ID,  MEMBERS, GUESTS,...rest} = req.body;
             const parsedMembers = MEMBERS.map(id => +id);
-            const result = await db('MEETINGS').update({...rest, MEMBERS:parsedMembers}).where("ID", ID).returning("*");
+            const parsedGuests = GUESTS.mpa(id => +id);
+            const result = await db('MEETINGS').update({...rest, MEMBERS:parsedMembers, GUESTS: parsedGuests}).where("ID", ID).returning("*");
             res.json({meeting: result[0]});
         }
         catch (error){
