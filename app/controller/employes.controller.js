@@ -64,7 +64,7 @@ class EmpolyesController {
 
     async putEmploye(req, res, next){
         try{
-            const {ID, LOGIN, PASSWORD, EMAIL, ROLE_ID, ...rest} = req.body;
+            const {ID, LOGIN, PASSWORD, EMAIL, ROLE_ID, ROLE_NAME, POST_NAME, DEPART_ID, DEPART_NAME, ...rest} = req.body;
             const result = await db('EMPLOYES').update(rest).where("ID", ID).returning('*');
             const {USER_ID} = result[0];
             const userResult = await db('USERS').update({LOGIN, PASSWORD:bcrypt.hashSync(PASSWORD), EMAIL, ROLE_ID}).where("USER_ID", USER_ID).returning('*');

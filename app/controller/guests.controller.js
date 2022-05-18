@@ -41,7 +41,7 @@ class GuestsController {
         try{
             const {LOGIN, EMAIL, PASSWORD, ROLE_ID,...rest} = req.body;
             const userRes = await db('USERS')
-                        .insert({LOGIN, EMAIL, PASSWORD:bcrypt.hashSync(PASSWORD), ROLE_ID})
+                        .insert({LOGIN, EMAIL, PASSWORD:bcrypt.hashSync(PASSWORD), ROLE_ID: 33})
                         .returning('USER_ID');
             const employeRes = await db('GUESTS')
                                 .insert({...rest, USER_ID: userRes[0].USER_ID})
@@ -57,10 +57,10 @@ class GuestsController {
 
     async putGuest(req, res, next){
         try{
-            const {ID, LOGIN, PASSWORD, EMAIL, ROLE_ID, ...rest} = req.body;
+            const {ID, LOGIN, PASSWORD, EMAIL, ROLE_ID, ROLE_NAME, ...rest} = req.body;
             const result = await db('GUESTS').update(rest).where("ID", ID).returning('*');
             const {USER_ID} = result[0];
-            const userResult = await db('USERS').update({LOGIN, PASSWORD:bcrypt.hashSync(PASSWORD), EMAIL, ROLE_ID}).where("USER_ID", USER_ID).returning('*');
+            const userResult = await db('USERS').update({LOGIN, PASSWORD:bcrypt.hashSync(PASSWORD), EMAIL, ROLE_ID: '33'}).where("USER_ID", USER_ID).returning('*');
             res.json({...result,...userResult});
         }
         catch (error){

@@ -48,7 +48,7 @@ class MeetingsController {
         try{
             const {ID,  MEMBERS, GUESTS,...rest} = req.body;
             const parsedMembers = MEMBERS.map(id => +id);
-            const parsedGuests = GUESTS.mpa(id => +id);
+            const parsedGuests = GUESTS.map(id => +id);
             const result = await db('MEETINGS').update({...rest, MEMBERS:parsedMembers, GUESTS: parsedGuests}).where("ID", ID).returning("*");
             res.json({meeting: result[0]});
         }
