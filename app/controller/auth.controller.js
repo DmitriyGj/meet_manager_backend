@@ -47,6 +47,11 @@ class AuthController {
             }
             const {USER_ID, ROLE_NAME, EMAIL, LOGIN:USER_LOGIN} = user;
             const employeProfile = await db.select('EMPLOYES.ID as ID').from('EMPLOYES').where('USER_ID', USER_ID).first();
+            if(!employeProfile){
+                const guestProfile = await db.select('GUESTS.ID as ID').from('GUESTS').where('USER_ID', USER_ID).first();
+                const token = generateAccessToken({...guestProfile, ...user, PASSWORD });
+                return res.json({token});
+            }
             console.log(employeProfile)
             const token = generateAccessToken({...employeProfile, ...user, PASSWORD });
             return res.json({token});

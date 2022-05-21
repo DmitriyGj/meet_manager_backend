@@ -78,6 +78,7 @@ class EmpolyesController {
 
     async deleteEmploye(req, res, next){
         try{
+            const meetings = await db('MEETINGS').where('INICIATOR_ID', req.params.id).update('INICIATOR_ID', null);
             const result = await db('EMPLOYES').where("ID", req.params.id).del().returning('*');
             const {USER_ID} = result[0];
             const userResult = await db('USERS').where("USER_ID", USER_ID).del().returning('*');
