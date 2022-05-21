@@ -3,13 +3,11 @@ const db = require('../DBConnection')
 class MeetingsController {
     async getMeetings(req, res, next ) {
         try{
-            const dbRes = await db.select('MEETINGS.ID as ID',
+            const dbRes = await db('MEETINGS').select('MEETINGS.ID as ID',
                                 'MEETINGS.START_DATE as START_DATE',
                                 'MEETINGS.END_DATE as END_DATE',
-                                'EMPLOYES.ID as INICIATOR_ID')
-                                .leftJoin("EMPLOYES", "EMPLOYES.ID" , "MEETINGS.INICIATOR_ID")
-                                .from('MEETINGS')
-            dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value.toString().trim()));
+                                'MEETINGS.INICIATOR_ID as INICIATOR_ID')
+            dbRes.forEach(item => Object.entries(item).forEach(([key,value] )=> item[key]=value?.toString()?.trim()));
             res.json(dbRes);
         }
         catch(err) {

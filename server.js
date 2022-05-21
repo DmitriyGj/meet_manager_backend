@@ -25,5 +25,5 @@ app.use('/api', meetingsRouter);
 app.use('/api', rolesRouter);
 app.use('/api', guestsRouter)
 
-const port = appConfig.Port || 8000;
+const port = appConfig.Port || 8010;
 app.listen(port, () => console.log(`Сервер работает на порту ${port}, http://localhost:${port}`));
